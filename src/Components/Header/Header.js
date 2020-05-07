@@ -1,4 +1,5 @@
 import React from "react";
+import { DebounceInput } from "react-debounce-input";
 
 const Header = (props) => {
   const { handleInputChange } = props;
@@ -6,7 +7,12 @@ const Header = (props) => {
   return (
     <>
       <form>
-        <input type="text" placeholder="Busca" onChange={handleInputChange} />
+        <DebounceInput
+          debounceTimeout={300}
+          type="text"
+          placeholder="Busca"
+          onChange={handleInputChange}
+        />
       </form>
     </>
   );
