@@ -1,77 +1,98 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { connect } from "react-redux";
+import * as actionCreators from "../../actions/index";
 import { Link } from "react-router-dom";
-import GetCharacters from "../../services/getCharacters";
-import GetSeries from "../../services/getSeries";
 import Header from "../../Components/Header/Header";
 
-function Main() {
-  const [characters, setCharacters] = useState([]);
+import {
+  Container,
+  Row,
+  Column,
+  Box,
+  ContentBox,
+  MediumTitle,
+  ClearSpace,
+  Buttons,
+} from "../../styles/grid.style";
+
+function Main(props) {
   const [searchResult, setSearchResult] = useState([]);
-  const [idCharacters, setIdCharacters] = useState("");
 
   useEffect(() => {
-    const secretKey = "d0b3e79e203c1593d5e57543698056ae";
-    const id = idCharacters ? idCharacters : "1011334";
-    console.log(idCharacters);
-    axios
-      .all([
-        GetCharacters.getCharacters(secretKey),
-        GetSeries.getSeries(secretKey, id),
-      ])
-      .then(
-        axios.spread(function (response, responseSeries) {
-          const listagem = response.data.data.results;
-          setCharacters(listagem);
-          console.log(response.data.data.results);
-          console.log(responseSeries.data.data.results);
-        })
-      );
-  }, [idCharacters]);
+    props.loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInputChange = (e) => {
     const searchBy = e.target.value || "";
     const lowerSearch = searchBy.toLowerCase();
-    const resultSearch = characters.filter((element) => {
+    const resultSearch = props.characters.filter((element) => {
       const lowerElement = element.name.toLowerCase();
       return lowerElement.indexOf(lowerSearch) !== -1;
     });
     setSearchResult(resultSearch);
   };
 
-  const list = searchResult.length !== 0 ? searchResult : characters;
+  const list = searchResult.length !== 0 ? searchResult : props.characters;
 
   return (
     <>
-      <Header handleInputChange={handleInputChange} />
-      <div>
-        <ul>
+      <Container>
+        <Row>
+          <Column mobile="12" tablet="12" desktop="6" padding={"40px 20px"}>
+            <MediumTitle>Marvel Characters</MediumTitle>
+          </Column>
+          <Column mobile="12" tablet="12" desktop="6" padding={"40px 20px"}>
+            <Header handleInputChange={handleInputChange} />
+          </Column>
+          <ClearSpace />
           {list.map((character) => {
             return (
-              <li key={character.id}>
-                {character.name}
-                <img
-                  width="100"
-                  src={`${character.thumbnail.path}.${character.thumbnail.extension}`}
-                  alt={`${character.name}`}
-                />
-                <Link to="/details">
-                  <button
-                    onClick={() => {
-                      console.log(character.id);
-                      setIdCharacters(character.id);
-                    }}
-                  >
-                    + detalhes
-                  </button>
-                </Link>
-              </li>
+              <Column mobile="12" tablet="4" desktop="3" key={character.id}>
+                <Box padding={"0"} margin={"0"}>
+                  <Box margin={"20px 15px 20px 0"}>
+                    <ContentBox margin={"0"}>
+                      <Box
+                        padding={"0"}
+                        margin={"0"}
+                        alignItems={"center"}
+                        flexDirection={"column"}
+                      >
+                        <Link to={`/details/${character.id}`}>
+                          <img
+                            width="100%"
+                            height="200px"
+                            src={`${character.thumbnail.path}.${character.thumbnail.extension}`}
+                            alt={`${character.name}`}
+                          />
+                        </Link>
+                        {character.name}
+                        <Buttons
+                          width={"70%"}
+                          bgColor={"#2bf0ad"}
+                          hover={"#fff"}
+                          onClick={() => {
+                            console.log(character.id);
+                            window.location.href = `/details/${character.id}`;
+                          }}
+                        >
+                          Details
+                        </Buttons>
+                      </Box>
+                    </ContentBox>
+                  </Box>
+                </Box>
+              </Column>
             );
           })}
-        </ul>
-      </div>
+        </Row>
+      </Container>
     </>
   );
 }
 
-export default Main;
+const mapStateToProps = (state) => {
+  return state;
+};
+
+export default connect(mapStateToProps, actionCreators)(Main);
