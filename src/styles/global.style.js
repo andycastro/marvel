@@ -24,4 +24,9 @@ export default createGlobalStyle`
     font-weight:100;
   }
 
+  li {
+    list-style:decimal;
+    margin:20px 0 20px 40px;
+  }
+
 `;

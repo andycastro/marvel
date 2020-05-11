@@ -11,11 +11,12 @@ export function loadData() {
       });
   };
 }
-export function loadDataDetails() {
+export function loadDataDetails(id) {
+  const idCharacter = id ? id : "000000";
   return (dispatch) => {
     return axios
       .get(
-        "https://gateway.marvel.com:443/v1/public/characters/1011334?apikey=d0b3e79e203c1593d5e57543698056ae"
+        `https://gateway.marvel.com:443/v1/public/characters/${idCharacter}?apikey=d0b3e79e203c1593d5e57543698056ae`
       )
       .then((response) => {
         dispatch(getCharactersDetails(response.data.data.results));

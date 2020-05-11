@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import * as actionCreators from "../../actions/index";
-import { Link } from "react-router-dom";
+import { bindActionCreators } from "redux";
+import { loadData } from "../../actions/index";
 import Header from "../../Components/Header/Header";
 
 import {
@@ -15,25 +15,24 @@ import {
   Buttons,
 } from "../../styles/grid.style";
 
-function Main(props) {
+function Main({ loadData, characters }) {
   const [searchResult, setSearchResult] = useState([]);
 
   useEffect(() => {
-    props.loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    loadData();
+  }, [loadData]);
 
   const handleInputChange = (e) => {
     const searchBy = e.target.value || "";
     const lowerSearch = searchBy.toLowerCase();
-    const resultSearch = props.characters.filter((element) => {
+    const resultSearch = characters.filter((element) => {
       const lowerElement = element.name.toLowerCase();
       return lowerElement.indexOf(lowerSearch) !== -1;
     });
     setSearchResult(resultSearch);
   };
 
-  const list = searchResult.length !== 0 ? searchResult : props.characters;
+  const list = searchResult.length !== 0 ? searchResult : characters;
 
   return (
     <>
@@ -58,21 +57,18 @@ function Main(props) {
                         alignItems={"center"}
                         flexDirection={"column"}
                       >
-                        <Link to={`/details/${character.id}`}>
-                          <img
-                            width="100%"
-                            height="200px"
-                            src={`${character.thumbnail.path}.${character.thumbnail.extension}`}
-                            alt={`${character.name}`}
-                          />
-                        </Link>
+                        <img
+                          width="100%"
+                          height="200px"
+                          src={`${character.thumbnail.path}.${character.thumbnail.extension}`}
+                          alt={`${character.name}`}
+                        />
                         {character.name}
                         <Buttons
                           width={"70%"}
                           bgColor={"#2bf0ad"}
                           hover={"#fff"}
                           onClick={() => {
-                            console.log(character.id);
                             window.location.href = `/details/${character.id}`;
                           }}
                         >
@@ -92,7 +88,14 @@ function Main(props) {
 }
 
 const mapStateToProps = (state) => {
-  return state;
+  return { characters: state.characters };
 };
 
-export default connect(mapStateToProps, actionCreators)(Main);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    dispatch,
+    ...bindActionCreators({ loadData }, dispatch),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Main);
